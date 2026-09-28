@@ -1,0 +1,1 @@
+<?php $title='500'; require __DIR__.'/layouts/header.php'; ?><div class="error-page"><div class="error-code">500</div><h1>Something went wrong.</h1><p class="muted">The error has been logged. Please try again.</p><a class="primary" href="/">Back to dashboard</a></div><?php require __DIR__.'/layouts/footer.php'; ?>
