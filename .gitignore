@@ -1,0 +1,42 @@
+# Dependencies
+vendor/
+composer.lock
+
+# Configuration
+config/config.php
+config/*.env
+.env
+
+# Logs
+*.log
+logs/
+
+# Uploads (keep directory, ignore contents)
+public/uploads/properties/*
+!public/uploads/properties/.gitkeep
+
+# Cache
+cache/
+*.cache
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Session files
+sessions/
+
+# Database exports
+database/*.sql
+!database/schema.sql
+
+# Build artifacts
+build/
+dist/
