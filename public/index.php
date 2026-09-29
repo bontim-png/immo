@@ -2,29 +2,29 @@
 // Entry point - all requests go through here
 
 // Error reporting based on environment
-require __DIR__ . '/../config/config.php';
+$config = require __DIR__ . '/../config/config.php';
 
 error_reporting(E_ALL);
-ini_set('display_errors', config('app.debug') ? '1' : '0');
+ini_set('display_errors', ($config['app']['debug'] ?? false) ? '1' : '0');
 ini_set('log_errors', '1');
 ini_set('error_log', __DIR__ . '/../logs/php_errors.log');
 
 // Set timezone
-date_default_timezone_set(config('app.timezone'));
+date_default_timezone_set($config['app']['timezone'] ?? 'UTC');
 
 // Start session
-session_name(config('auth.session_name'));
+session_name($config['auth']['session_name'] ?? 'immo_session');
 session_set_cookie_params([
-    'lifetime' => config('auth.cookie_lifetime'),
-    'secure' => config('auth.cookie_secure'),
-    'httponly' => config('auth.cookie_httponly'),
-    'samesite' => config('auth.cookie_samesite'),
+    'lifetime' => $config['auth']['cookie_lifetime'] ?? 86400,
+    'secure' => $config['auth']['cookie_secure'] ?? true,
+    'httponly' => $config['auth']['cookie_httponly'] ?? true,
+    'samesite' => $config['auth']['cookie_samesite'] ?? 'Lax',
 ]);
 session_start();
 
 // Set language from session or default
-if (!isset($_SESSION['language']) || !in_array($_SESSION['language'], config('app.supported_languages'))) {
-    $_SESSION['language'] = config('app.default_language');
+if (!isset($_SESSION['language']) || !in_array($_SESSION['language'], ($config['app']['supported_languages'] ?? ['fr', 'en', 'nl']))) {
+    $_SESSION['language'] = $config['app']['default_language'] ?? 'fr';
 }
 
 // Autoload classes
@@ -53,7 +53,7 @@ use App\Database\Database;
 use App\Database\Connection;
 
 try {
-    $dbConfig = config('database');
+    $dbConfig = $config['database'];
     Connection::setConfig($dbConfig);
     Database::init();
 } catch (PDOException $e) {
@@ -61,7 +61,7 @@ try {
     error_log('Database connection failed: ' . $e->getMessage());
     
     // Show user-friendly error in production
-    if (!config('app.debug')) {
+    if (!($config['app']['debug'] ?? false)) {
         http_response_code(503);
         include __DIR__ . '/errors/503.php';
         exit;
@@ -88,7 +88,7 @@ try {
     error_log('Application error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
     
     // Show user-friendly error
-    if (!config('app.debug')) {
+    if (!($config['app']['debug'] ?? false)) {
         http_response_code(500);
         include __DIR__ . '/errors/500.php';
         exit;
