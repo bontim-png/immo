@@ -106,7 +106,7 @@ class Router
         if ($request->isAjax()) {
             echo json_encode(['error' => trans('not_found')]);
         } else {
-            include __DIR__ . '/../../../public/errors/404.php';
+            include __DIR__ . '/../../public/errors/404.php';
         }
         exit;
     }
