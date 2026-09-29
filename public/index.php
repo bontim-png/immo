@@ -32,7 +32,16 @@ $dashboard = new DashboardController($db, $i18n);
 $property = new PropertyController($db, $i18n);
 $router->get('/', fn() => $dashboard->index());
 $router->get('/property', fn() => $property->show());
+$router->get('/properties', fn() => $property->index());
+$router->get('/property/edit', fn() => $property->edit());
+$router->get('/api/agents', fn() => $property->agents());
+$router->post('/api/property/save', fn() => $property->save());
+$router->post('/api/property/photos/upload', fn() => $property->uploadPhotos());
+$router->post('/api/property/photos/reorder', fn() => $property->reorder());
+$router->post('/api/property/photos/hero', fn() => $property->hero());
+$router->post('/api/property/photos/delete', fn() => $property->deletePhoto());
 
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $path = rtrim($path, '/') ?: '/';
-$router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $path);
+$result = $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $path);
+if ($result === null && http_response_code() === 404) { View::render('404'); }
