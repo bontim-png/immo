@@ -1,19 +1,19 @@
 <?php
 namespace App\Controllers;
 
-use App\Models\User;
+use App\Models\Agent;
 use App\Models\Office;
 use App\Http\Request;
 
 class UserController extends Controller
 {
-    private $userModel;
+    private $agentModel;
     private $officeModel;
 
     public function __construct()
     {
         parent::__construct();
-        $this->userModel = new User();
+        $this->agentModel = new Agent();
         $this->officeModel = new Office();
     }
 
@@ -21,19 +21,20 @@ class UserController extends Controller
     {
         if (!$this->isAdmin()) {
             http_response_code(403);
-            $this->view('errors.403');
+            $this->view('errors/403');
             return;
         }
 
-        $users = $this->userModel->all();
+        $agents = $this->agentModel->all();
         
         // Add office info
-        foreach ($users as &$user) {
-            $user['office'] = $this->officeModel->find($user['office_id']);
+        foreach ($agents as &$agent) {
+            $agent['office'] = $this->officeModel->find($agent['office_id']);
         }
 
-        $this->view('users.index', [
-            'users' => $users,
+        $this->view('agents.index', [
+            'agents' => $agents,
+            'isAdmin' => true,
         ]);
     }
 
@@ -41,14 +42,15 @@ class UserController extends Controller
     {
         if (!$this->isAdmin()) {
             http_response_code(403);
-            $this->view('errors.403');
+            $this->view('errors/403');
             return;
         }
 
         $offices = $this->officeModel->getActiveOffices();
 
-        $this->view('users.create', [
+        $this->view('agents.create', [
             'offices' => $offices,
+            'isAdmin' => true,
         ]);
     }
 
@@ -56,7 +58,7 @@ class UserController extends Controller
     {
         if (!$this->isAdmin()) {
             http_response_code(403);
-            $this->view('errors.403');
+            $this->view('errors/403');
             return;
         }
 
@@ -73,7 +75,7 @@ class UserController extends Controller
 
         // Custom validation: email must be unique
         $email = $request->getBody('email');
-        if ($email && $this->userModel->findByEmail($email)) {
+        if ($email && $this->agentModel->findByEmail($email)) {
             $errors['email'][] = trans('validation.unique', ['field' => trans('email')]);
         }
 
@@ -86,35 +88,35 @@ class UserController extends Controller
         $data = $request->getBody();
         $data['status'] = $data['status'] ?? 'active';
 
-        $userId = $this->userModel->create($data);
+        $agentId = $this->agentModel->create($data);
 
-        $_SESSION['toast'] = ['success' => trans('users.created_success')];
-        $this->redirect(route('users.edit', ['id' => $userId]));
+        $_SESSION['toast'] = ['success' => trans('agents.created_success')];
+        $this->redirect(route('users.edit', ['id' => $agentId]));
     }
 
     public function edit(Request $request): void
     {
         $id = (int)$request->getRouteParam('id');
-        $user = $this->userModel->find($id);
+        $agent = $this->agentModel->find($id);
         
-        if (!$user) {
+        if (!$agent) {
             http_response_code(404);
-            $this->view('errors.404');
+            $this->view('errors/404');
             return;
         }
 
-        // Check access - only admin can edit other users
+        // Check access - only admin can edit other agents
         if (!$this->isAdmin() && $id !== $this->getUserId()) {
             http_response_code(403);
-            $this->view('errors.403');
+            $this->view('errors/403');
             return;
         }
 
         $offices = $this->officeModel->getActiveOffices();
-        $user['office'] = $this->officeModel->find($user['office_id']);
+        $agent['office'] = $this->officeModel->find($agent['office_id']);
 
         $this->view('users.edit', [
-            'user' => $user,
+            'agent' => $agent,
             'offices' => $offices,
         ]);
     }
@@ -122,17 +124,17 @@ class UserController extends Controller
     public function update(Request $request): void
     {
         $id = (int)$request->getRouteParam('id');
-        $user = $this->userModel->find($id);
+        $agent = $this->agentModel->find($id);
         
-        if (!$user) {
-            $_SESSION['toast'] = ['error' => trans('users.not_found')];
+        if (!$agent) {
+            $_SESSION['toast'] = ['error' => trans('agents.not_found')];
             $this->redirect(route('users.index'));
         }
 
         // Check access
         if (!$this->isAdmin() && $id !== $this->getUserId()) {
             http_response_code(403);
-            $this->view('errors.403');
+            $this->view('errors/403');
             return;
         }
 
@@ -152,10 +154,10 @@ class UserController extends Controller
 
         $errors = $this->validate($rules);
 
-        // Custom validation: email must be unique (excluding current user)
+        // Custom validation: email must be unique (excluding current agent)
         $email = $request->getBody('email');
-        if ($email && $email !== $user['email']) {
-            $existing = $this->userModel->findByEmail($email);
+        if ($email && $email !== $agent['email']) {
+            $existing = $this->agentModel->findByEmail($email);
             if ($existing && $existing['id'] != $id) {
                 $errors['email'][] = trans('validation.unique', ['field' => trans('email')]);
             }
@@ -188,31 +190,31 @@ class UserController extends Controller
             unset($data['password']);
         }
 
-        $this->userModel->update($id, $data);
+        $this->agentModel->update($id, $data);
 
         // Update password separately if provided
         if (!empty($password)) {
-            $this->userModel->updatePassword($id, $password);
+            $this->agentModel->updatePassword($id, $password);
         }
 
-        $_SESSION['toast'] = ['success' => trans('users.updated_success')];
+        $_SESSION['toast'] = ['success' => trans('agents.updated_success')];
         $this->redirect(route('users.edit', ['id' => $id]));
     }
 
     public function destroy(Request $request): void
     {
         $id = (int)$request->getRouteParam('id');
-        $user = $this->userModel->find($id);
+        $agent = $this->agentModel->find($id);
         
-        if (!$user) {
-            $_SESSION['toast'] = ['error' => trans('users.not_found')];
+        if (!$agent) {
+            $_SESSION['toast'] = ['error' => trans('agents.not_found')];
             $this->redirect(route('users.index'));
         }
 
-        // Only admin can delete users
+        // Only admin can delete agents
         if (!$this->isAdmin()) {
             http_response_code(403);
-            $this->view('errors.403');
+            $this->view('errors/403');
             return;
         }
 
@@ -222,9 +224,17 @@ class UserController extends Controller
             $this->redirect(route('users.index'));
         }
 
-        $this->userModel->delete($id);
+        // Check if agent has properties
+        $propertyModel = new \App\Models\Property();
+        $propertyCount = count($propertyModel->getByAgent($id));
+        if ($propertyCount > 0) {
+            $_SESSION['toast'] = ['error' => trans('agents.cannot_delete_with_properties')];
+            $this->redirect(route('users.index'));
+        }
 
-        $_SESSION['toast'] = ['success' => trans('users.deleted_success')];
+        $this->agentModel->delete($id);
+
+        $_SESSION['toast'] = ['success' => trans('agents.deleted_success')];
         $this->redirect(route('users.index'));
     }
 }

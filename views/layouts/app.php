@@ -52,18 +52,6 @@
                     <span class="nav-icon">&#128101;</span>
                     <span class="nav-text"><?= trans('agents') ?></span>
                 </a>
-                
-                <a href="<?= route('users.index') ?>" class="nav-item <?= $activeNav === 'users' ? 'active' : '' ?>">
-                    <span class="nav-icon">&#128272;</span>
-                    <span class="nav-text"><?= trans('users') ?></span>
-                </a>
-            <?php endif; ?>
-            
-            <?php if (!$isAdmin): ?>
-                <a href="<?= route('offices.show', ['id' => $userOfficeId ?? '']) ?>" class="nav-item <?= $activeNav === 'office' ? 'active' : '' ?>">
-                    <span class="nav-icon">&#127970;</span>
-                    <span class="nav-text"><?= trans('my_office') ?></span>
-                </a>
             <?php endif; ?>
         </nav>
         

@@ -3,6 +3,7 @@ namespace App\Controllers;
 
 use App\Http\Request;
 use App\Http\Response;
+use App\Models\Agent;
 
 abstract class Controller
 {
@@ -135,36 +136,76 @@ abstract class Controller
         return null;
     }
 
+    /**
+     * Get current user (agent) from session
+     */
     protected function getUser()
     {
         return $_SESSION['user'] ?? null;
     }
 
+    /**
+     * Get current user ID
+     */
     protected function getUserId()
     {
         return $_SESSION['user']['id'] ?? null;
     }
 
+    /**
+     * Get current user's office ID
+     */
     protected function getUserOfficeId()
     {
         return $_SESSION['user']['office_id'] ?? null;
     }
 
+    /**
+     * Check if current user is admin
+     */
     protected function isAdmin(): bool
     {
-        return ($this->getUser()['role'] ?? '') === 'admin';
+        $user = $this->getUser();
+        return $user && ($user['role'] ?? '') === 'admin';
     }
 
+    /**
+     * Check if current user is an agent
+     */
     protected function isAgent(): bool
     {
-        return ($this->getUser()['role'] ?? '') === 'agent';
+        $user = $this->getUser();
+        return $user && ($user['role'] ?? '') === 'agent';
     }
 
+    /**
+     * Check if user can access a specific office
+     */
     protected function canAccessOffice($officeId): bool
     {
         if ($this->isAdmin()) {
             return true;
         }
         return $this->getUserOfficeId() == $officeId;
+    }
+
+    /**
+     * Check if user can manage a specific agent
+     */
+    protected function canManageAgent($agentId): bool
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+        
+        $agentModel = new Agent();
+        $agent = $agentModel->find($agentId);
+        
+        if (!$agent) {
+            return false;
+        }
+        
+        // Non-admin can only manage agents from their own office
+        return $agent['office_id'] == $this->getUserOfficeId();
     }
 }

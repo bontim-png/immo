@@ -35,12 +35,16 @@ CREATE TABLE agents (
     email VARCHAR(190) NULL,
     phone VARCHAR(60) NULL,
     photo_path VARCHAR(255) NULL,
+    password VARCHAR(255) NULL,
+    role ENUM('admin','agent') NOT NULL DEFAULT 'agent',
     status ENUM('active','inactive') NOT NULL DEFAULT 'active',
+    last_login_at DATETIME NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_agents_office FOREIGN KEY (office_id) REFERENCES offices(id) ON DELETE RESTRICT ON UPDATE CASCADE,
     INDEX idx_agents_office_status (office_id, status),
-    INDEX idx_agents_name (last_name, first_name)
+    INDEX idx_agents_name (last_name, first_name),
+    INDEX idx_agents_email (email)
 ) ENGINE=InnoDB;
 
 CREATE TABLE properties (
@@ -99,8 +103,14 @@ CREATE TABLE property_photos (
 INSERT INTO offices (name, email, phone, city, country_code) VALUES
 ('Demo Immobilier', 'demo@example.com', '+33 5 00 00 00 00', 'Cahors', 'FR');
 
-INSERT INTO agents (office_id, first_name, last_name, email, phone)
-SELECT id, 'Claire', 'Martin', 'claire@example.com', '+33 6 00 00 00 00'
+-- Admin user for Demo Immobilier
+INSERT INTO agents (office_id, first_name, last_name, email, phone, password, role)
+SELECT id, 'Admin', 'User', 'admin@demo-immo.com', '+33 6 00 00 00 00', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin'
+FROM offices WHERE name = 'Demo Immobilier' LIMIT 1;
+
+-- Regular agent
+INSERT INTO agents (office_id, first_name, last_name, email, phone, password, role)
+SELECT id, 'Claire', 'Martin', 'claire@demo-immo.com', '+33 6 00 00 00 01', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'agent'
 FROM offices WHERE name = 'Demo Immobilier' LIMIT 1;
 
 INSERT INTO properties (office_id, agent_id, reference_code, property_type, listing_status, transaction_type, title, slug, description, price, living_area_m2, land_area_m2, bedrooms, bathrooms, city, postal_code, country_code)

@@ -163,14 +163,14 @@ class PropertyController extends Controller
         
         if (!$property) {
             http_response_code(404);
-            $this->view('errors.404');
+            $this->view('errors/404');
             return;
         }
 
         // Check access
         if (!$this->canAccessOffice($property['office_id'])) {
             http_response_code(403);
-            $this->view('errors.403');
+            $this->view('errors/403');
             return;
         }
 
@@ -186,19 +186,19 @@ class PropertyController extends Controller
 
     public function edit(Request $request): void
     {
-        $id = $request->getRouteParam('id');
+        $id = (int)$request->getRouteParam('id');
         $property = $this->propertyModel->find($id);
         
         if (!$property) {
             http_response_code(404);
-            $this->view('errors.404');
+            $this->view('errors/404');
             return;
         }
 
         // Check access
         if (!$this->canAccessOffice($property['office_id'])) {
             http_response_code(403);
-            $this->view('errors.403');
+            $this->view('errors/403');
             return;
         }
 
@@ -239,7 +239,7 @@ class PropertyController extends Controller
         // Check access
         if (!$this->canAccessOffice($property['office_id'])) {
             http_response_code(403);
-            $this->view('errors.403');
+            $this->view('errors/403');
             return;
         }
 
@@ -316,7 +316,7 @@ class PropertyController extends Controller
         // Check access
         if (!$this->canAccessOffice($property['office_id'])) {
             http_response_code(403);
-            $this->view('errors.403');
+            $this->view('errors/403');
             return;
         }
 

@@ -51,12 +51,4 @@ $router->group(['middleware' => 'App\Middleware\AuthMiddleware'], function($rout
     $router->get('/agents/{id}/edit', 'App\Controllers\AgentController@edit')->name('agents.edit');
     $router->put('/agents/{id}', 'App\Controllers\AgentController@update');
     $router->delete('/agents/{id}', 'App\Controllers\AgentController@destroy');
-    
-    // Users (for internal auth)
-    $router->get('/users', 'App\Controllers\UserController@index')->name('users.index');
-    $router->get('/users/create', 'App\Controllers\UserController@create')->name('users.create');
-    $router->post('/users', 'App\Controllers\UserController@store');
-    $router->get('/users/{id}/edit', 'App\Controllers\UserController@edit')->name('users.edit');
-    $router->put('/users/{id}', 'App\Controllers\UserController@update');
-    $router->delete('/users/{id}', 'App\Controllers\UserController@destroy');
 });

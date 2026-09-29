@@ -101,6 +101,7 @@ class AgentController extends Controller
             'first_name' => 'required',
             'last_name' => 'required',
             'email' => 'required|email',
+            'password' => 'required|min:8',
         ];
 
         $errors = $this->validate($rules);
@@ -115,7 +116,7 @@ class AgentController extends Controller
 
         // Custom validation: email must be unique
         $email = $request->getBody('email');
-        if ($email && $this->agentModel->firstWhere('email', $email)) {
+        if ($email && $this->agentModel->findByEmail($email)) {
             $errors['email'][] = trans('validation.unique', ['field' => trans('email')]);
         }
 
@@ -127,10 +128,12 @@ class AgentController extends Controller
 
         $data = $request->getBody();
         $data['status'] = $data['status'] ?? 'active';
+        $data['role'] = $data['role'] ?? 'agent';
 
-        // Only admin can assign to different offices
+        // Only admin can assign to different offices or set admin role
         if (!$this->isAdmin()) {
             $data['office_id'] = $this->getUserOfficeId();
+            $data['role'] = 'agent';
         }
 
         $agentId = $this->agentModel->create($data);
@@ -146,14 +149,14 @@ class AgentController extends Controller
         
         if (!$agent) {
             http_response_code(404);
-            $this->view('errors.404');
+            $this->view('errors/404');
             return;
         }
 
         // Check access
-        if (!$this->isAdmin() && $agent['office_id'] != $this->getUserOfficeId()) {
+        if (!$this->canManageAgent($id)) {
             http_response_code(403);
-            $this->view('errors.403');
+            $this->view('errors/403');
             return;
         }
 
@@ -173,14 +176,14 @@ class AgentController extends Controller
         
         if (!$agent) {
             http_response_code(404);
-            $this->view('errors.404');
+            $this->view('errors/404');
             return;
         }
 
         // Check access
-        if (!$this->isAdmin() && $agent['office_id'] != $this->getUserOfficeId()) {
+        if (!$this->canManageAgent($id)) {
             http_response_code(403);
-            $this->view('errors.403');
+            $this->view('errors/403');
             return;
         }
 
@@ -209,9 +212,9 @@ class AgentController extends Controller
         }
 
         // Check access
-        if (!$this->isAdmin() && $agent['office_id'] != $this->getUserOfficeId()) {
+        if (!$this->canManageAgent($id)) {
             http_response_code(403);
-            $this->view('errors.403');
+            $this->view('errors/403');
             return;
         }
 
@@ -222,12 +225,17 @@ class AgentController extends Controller
             'email' => 'required|email',
         ];
 
+        // Only admin can change office and role
+        if (!$this->isAdmin()) {
+            unset($rules['office_id']);
+        }
+
         $errors = $this->validate($rules);
 
         // Custom validation: user can only assign to their own office
         if (!$this->isAdmin()) {
             $officeId = $request->getBody('office_id');
-            if ($officeId != $this->getUserOfficeId()) {
+            if ($officeId && $officeId != $this->getUserOfficeId()) {
                 $errors['office_id'][] = trans('validation.office_access_denied');
             }
         }
@@ -235,9 +243,17 @@ class AgentController extends Controller
         // Custom validation: email must be unique (excluding current agent)
         $email = $request->getBody('email');
         if ($email && $email !== $agent['email']) {
-            $existing = $this->agentModel->firstWhere('email', $email);
+            $existing = $this->agentModel->findByEmail($email);
             if ($existing && $existing['id'] != $id) {
                 $errors['email'][] = trans('validation.unique', ['field' => trans('email')]);
+            }
+        }
+
+        // Handle password change separately
+        $password = $request->getBody('password');
+        if (!empty($password)) {
+            if (strlen($password) < 8) {
+                $errors['password'][] = trans('validation.min', ['field' => trans('password'), 'min' => 8]);
             }
         }
 
@@ -249,12 +265,23 @@ class AgentController extends Controller
 
         $data = $request->getBody();
         
-        // Only admin can change office
+        // Only admin can change office and role
         if (!$this->isAdmin()) {
             unset($data['office_id']);
+            unset($data['role']);
+        }
+        
+        // Remove password from data if not changing
+        if (empty($data['password'])) {
+            unset($data['password']);
         }
 
         $this->agentModel->update($id, $data);
+
+        // Update password separately if provided
+        if (!empty($password)) {
+            $this->agentModel->updatePassword($id, $password);
+        }
 
         $_SESSION['toast'] = ['success' => trans('agents.updated_success')];
         $this->redirect(route('agents.edit', ['id' => $id]));
@@ -271,10 +298,16 @@ class AgentController extends Controller
         }
 
         // Check access
-        if (!$this->isAdmin() && $agent['office_id'] != $this->getUserOfficeId()) {
+        if (!$this->canManageAgent($id)) {
             http_response_code(403);
-            $this->view('errors.403');
+            $this->view('errors/403');
             return;
+        }
+
+        // Cannot delete self
+        if ($id === $this->getUserId()) {
+            $_SESSION['toast'] = ['error' => trans('users.cannot_delete_self')];
+            $this->redirect(route('agents.index'));
         }
 
         // Check if agent has properties

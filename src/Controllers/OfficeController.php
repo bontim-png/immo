@@ -46,7 +46,7 @@ class OfficeController extends Controller
     {
         if (!$this->isAdmin()) {
             http_response_code(403);
-            $this->view('errors.403');
+            $this->view('errors/403');
             return;
         }
 
@@ -57,7 +57,7 @@ class OfficeController extends Controller
     {
         if (!$this->isAdmin()) {
             http_response_code(403);
-            $this->view('errors.403');
+            $this->view('errors/403');
             return;
         }
 
@@ -92,14 +92,14 @@ class OfficeController extends Controller
         
         if (!$office) {
             http_response_code(404);
-            $this->view('errors.404');
+            $this->view('errors/404');
             return;
         }
 
         // Check access
         if (!$this->isAdmin() && $id != $this->getUserOfficeId()) {
             http_response_code(403);
-            $this->view('errors.403');
+            $this->view('errors/403');
             return;
         }
 
@@ -120,14 +120,14 @@ class OfficeController extends Controller
         
         if (!$office) {
             http_response_code(404);
-            $this->view('errors.404');
+            $this->view('errors/404');
             return;
         }
 
         // Check access
         if (!$this->isAdmin() && $id != $this->getUserOfficeId()) {
             http_response_code(403);
-            $this->view('errors.403');
+            $this->view('errors/403');
             return;
         }
 
@@ -149,7 +149,7 @@ class OfficeController extends Controller
         // Check access
         if (!$this->isAdmin() && $id != $this->getUserOfficeId()) {
             http_response_code(403);
-            $this->view('errors.403');
+            $this->view('errors/403');
             return;
         }
 
@@ -187,14 +187,16 @@ class OfficeController extends Controller
         // Only admin can delete offices
         if (!$this->isAdmin()) {
             http_response_code(403);
-            $this->view('errors.403');
+            $this->view('errors/403');
             return;
         }
 
-        // Check if office has properties
+        // Check if office has properties or agents
         $propertyCount = count($this->propertyModel->getByOffice($id));
-        if ($propertyCount > 0) {
-            $_SESSION['toast'] = ['error' => trans('offices.cannot_delete_with_properties')];
+        $agentCount = count($this->agentModel->getAgentsByOffice($id));
+        
+        if ($propertyCount > 0 || $agentCount > 0) {
+            $_SESSION['toast'] = ['error' => trans('offices.cannot_delete_with_data')];
             $this->redirect(route('offices.index'));
         }
 

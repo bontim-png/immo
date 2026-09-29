@@ -1,17 +1,17 @@
 <?php
 namespace App\Controllers;
 
-use App\Models\User;
+use App\Models\Agent;
 use App\Http\Request;
 
 class AuthController extends Controller
 {
-    private $userModel;
+    private $agentModel;
 
     public function __construct()
     {
         parent::__construct();
-        $this->userModel = new User();
+        $this->agentModel = new Agent();
     }
 
     public function showLogin(Request $request): void
@@ -44,17 +44,17 @@ class AuthController extends Controller
             $this->redirect(route('login'));
         }
 
-        // Find user
-        $user = $this->userModel->findByEmail($email);
+        // Find agent by email
+        $agent = $this->agentModel->findByEmail($email);
         
-        if (!$user || !$this->userModel->verifyPassword($user['id'], $password)) {
+        if (!$agent || !$this->agentModel->verifyPassword($agent['id'], $password)) {
             $_SESSION['errors'] = ['email' => [trans('auth.invalid_credentials')]];
             $_SESSION['old_input'] = ['email' => $email];
             $this->redirect(route('login'));
         }
 
         // Check status
-        if ($user['status'] !== 'active') {
+        if ($agent['status'] !== 'active') {
             $_SESSION['errors'] = ['email' => [trans('auth.account_inactive')]];
             $this->redirect(route('login'));
         }
@@ -62,17 +62,17 @@ class AuthController extends Controller
         // Regenerate session ID to prevent session fixation
         session_regenerate_id(true);
 
-        // Set user session
-        unset($user['password']);
-        unset($user['remember_token']);
+        // Set user session (using agent data)
+        unset($agent['password']);
         
-        $_SESSION['user'] = $user;
+        $_SESSION['user'] = $agent;
+        $_SESSION['user']['user_type'] = 'agent';
         $_SESSION['logged_in'] = true;
         $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'] ?? '';
         $_SESSION['ip_address'] = $this->request->getIp();
 
         // Record login
-        $this->userModel->recordLogin($user['id']);
+        $this->agentModel->recordLogin($agent['id']);
 
         // Redirect to intended URL or dashboard
         $intended = $_SESSION['url.intended'] ?? route('dashboard');
