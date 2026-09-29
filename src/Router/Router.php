@@ -15,7 +15,6 @@ class Router
 
     public function __construct()
     {
-        $this->request = new Request();
     }
 
     public function group(array $attributes, callable $callback): void
@@ -87,7 +86,7 @@ class Router
 
     public function dispatch(): void
     {
-        $request = new Request();
+        $request = new \App\Http\Request();
         $uri = $request->getUri();
         $method = $request->getMethod();
 
