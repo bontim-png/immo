@@ -30,6 +30,12 @@ class Request
             $uri = substr($uri, 0, $pos);
         }
         
+        // Remove the base path (/immobilier/public) to get the route path
+        $basePath = dirname($_SERVER['SCRIPT_NAME'] ?? '/');
+        if ($basePath !== '/' && strpos($uri, $basePath) === 0) {
+            $uri = substr($uri, strlen($basePath));
+        }
+        
         // Normalize
         $uri = rawurldecode($uri);
         $uri = trim($uri, '/');
