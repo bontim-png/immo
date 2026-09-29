@@ -204,10 +204,12 @@ function base_url(): string
 
 /**
  * Get asset URL
+ * Note: Does NOT add /public/ because base_url() already includes it
+ * when the entry point is in the public directory
  */
 function asset(string $path): string
 {
-    return base_url() . '/public/' . ltrim($path, '/');
+    return base_url() . '/' . ltrim($path, '/');
 }
 
 /**
