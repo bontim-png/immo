@@ -1,1 +1,0 @@
-<?php $title='404'; require __DIR__.'/layouts/header.php'; ?><div class="error-page"><div class="error-code">404</div><h1><?= htmlspecialchars($i18n->t('error.404')) ?></h1><a class="primary" href="/">← <?= htmlspecialchars($i18n->t('app.dashboard')) ?></a></div><?php require __DIR__.'/layouts/footer.php'; ?>
