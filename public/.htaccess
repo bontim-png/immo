@@ -21,6 +21,9 @@
     Deny from all
 </FilesMatch>
 
+# Ensure index.php is the directory index
+DirectoryIndex index.php
+
 # Compress responses
 <IfModule mod_deflate.c>
     AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/json
