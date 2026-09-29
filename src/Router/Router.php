@@ -12,6 +12,7 @@ class Router
     private $prefix = '';
     private $middleware = [];
     private $namedRoutes = [];
+    private $request = null;
 
     public function __construct()
     {

@@ -1,5 +1,5 @@
 <?php
-http_response_code(500);
+http_response_code(503);
 
 // Initialize basic environment for error pages
 require_once __DIR__ . '/../../config/config.php';
@@ -16,7 +16,7 @@ if (session_status() === PHP_SESSION_NONE) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>500 - <?= trans('server_error') ?> | IMMO</title>
+    <title>503 - <?= trans('service_unavailable') ?> | IMMO</title>
     <link rel="stylesheet" href="<?= asset('css/app.css') ?>">
     <style>
         body {
@@ -34,7 +34,7 @@ if (session_status() === PHP_SESSION_NONE) {
         .error-code {
             font-size: 6rem;
             font-weight: 700;
-            color: #ef4444;
+            color: #f59e0b;
             line-height: 1;
             margin-bottom: 1rem;
         }
@@ -85,9 +85,9 @@ if (session_status() === PHP_SESSION_NONE) {
 </head>
 <body>
     <div class="error-container">
-        <div class="error-code">500</div>
-        <h1 class="error-title"><?= trans('server_error') ?></h1>
-        <p class="error-message"><?= trans('server_error_message') ?></p>
+        <div class="error-code">503</div>
+        <h1 class="error-title"><?= trans('service_unavailable') ?></h1>
+        <p class="error-message"><?= trans('service_unavailable_message') ?></p>
         <div class="error-actions">
             <a href="/immobilier/public/" class="btn btn-primary">
                 &#127968; <?= trans('go_home') ?>

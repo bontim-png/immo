@@ -1,5 +1,15 @@
 <?php
 http_response_code(404);
+
+// Initialize basic environment for error pages
+require_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/../../src/Helpers/functions.php';
+
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="<?= htmlspecialchars($_SESSION['language'] ?? 'fr') ?>">
@@ -79,10 +89,10 @@ http_response_code(404);
         <h1 class="error-title"><?= trans('not_found') ?></h1>
         <p class="error-message"><?= trans('page_not_found') ?></p>
         <div class="error-actions">
-            <a href="/" class="btn btn-primary">
+            <a href="/immobilier/public/" class="btn btn-primary">
                 &#127968; <?= trans('go_home') ?>
             </a>
-            <a href="<?= route('properties.index') ?>" class="btn btn-secondary">
+            <a href="/immobilier/public/properties" class="btn btn-secondary">
                 <?= trans('browse_properties') ?>
             </a>
         </div>

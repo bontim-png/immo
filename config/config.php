@@ -23,4 +23,11 @@ return [
         'upload_max_size' => 12 * 1024 * 1024, // 12MB
         'upload_allowed_types' => ['image/jpeg', 'image/png', 'image/webp'],
     ],
+    'auth' => [
+        'session_name' => 'immo_session',
+        'cookie_lifetime' => 86400, // 24 hours
+        'cookie_secure' => true,
+        'cookie_httponly' => true,
+        'cookie_samesite' => 'Lax',
+    ],
 ];

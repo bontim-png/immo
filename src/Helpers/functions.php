@@ -48,58 +48,9 @@ function trans(string $key, array $params = []): string
 }
 
 /**
- * Format price according to locale
- */
-function format_price(float $price, string $currency = 'EUR', string $language = null): string
-{
-    $language = $language ?? ($_SESSION['language'] ?? config('app.default_language', 'fr'));
-    $locale = self::getLocaleForLanguage($language);
-    
-    $formatter = new NumberFormatter($locale, NumberFormatter::CURRENCY);
-    return $formatter->formatCurrency($price, $currency);
-}
-
-/**
- * Format number according to locale
- */
-function format_number(float $number, int $decimals = 0, string $language = null): string
-{
-    $language = $language ?? ($_SESSION['language'] ?? config('app.default_language', 'fr'));
-    $locale = self::getLocaleForLanguage($language);
-    
-    $formatter = new NumberFormatter($locale, NumberFormatter::DECIMAL);
-    $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $decimals);
-    return $formatter->format($number);
-}
-
-/**
- * Format date according to locale
- */
-function format_date(string $date, string $format = 'medium', string $language = null): string
-{
-    $language = $language ?? ($_SESSION['language'] ?? config('app.default_language', 'fr'));
-    $locale = self::getLocaleForLanguage($language);
-    
-    $timestamp = strtotime($date);
-    if ($timestamp === false) {
-        return $date;
-    }
-    
-    $intlFormatter = new IntlDateFormatter(
-        $locale,
-        self::getIntlDateType($format),
-        self::getIntlTimeType($format),
-        date_default_timezone_get(),
-        IntlDateFormatter::GREGORIAN
-    );
-    
-    return $intlFormatter->format($timestamp);
-}
-
-/**
  * Get locale string from language code
  */
-private static function getLocaleForLanguage(string $language): string
+function getLocaleForLanguage(string $language): string
 {
     $map = [
         'fr' => 'fr_FR',
@@ -112,7 +63,7 @@ private static function getLocaleForLanguage(string $language): string
 /**
  * Map format string to IntlDateFormatter date type
  */
-private static function getIntlDateType(string $format): int
+function getIntlDateType(string $format): int
 {
     $map = [
         'short' => IntlDateFormatter::SHORT,
@@ -126,9 +77,58 @@ private static function getIntlDateType(string $format): int
 /**
  * Map format string to IntlDateFormatter time type
  */
-private static function getIntlTimeType(string $format): int
+function getIntlTimeType(string $format): int
 {
     return IntlDateFormatter::NONE; // No time by default
+}
+
+/**
+ * Format price according to locale
+ */
+function format_price(float $price, string $currency = 'EUR', string $language = null): string
+{
+    $language = $language ?? ($_SESSION['language'] ?? config('app.default_language', 'fr'));
+    $locale = getLocaleForLanguage($language);
+    
+    $formatter = new NumberFormatter($locale, NumberFormatter::CURRENCY);
+    return $formatter->formatCurrency($price, $currency);
+}
+
+/**
+ * Format number according to locale
+ */
+function format_number(float $number, int $decimals = 0, string $language = null): string
+{
+    $language = $language ?? ($_SESSION['language'] ?? config('app.default_language', 'fr'));
+    $locale = getLocaleForLanguage($language);
+    
+    $formatter = new NumberFormatter($locale, NumberFormatter::DECIMAL);
+    $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $decimals);
+    return $formatter->format($number);
+}
+
+/**
+ * Format date according to locale
+ */
+function format_date(string $date, string $format = 'medium', string $language = null): string
+{
+    $language = $language ?? ($_SESSION['language'] ?? config('app.default_language', 'fr'));
+    $locale = getLocaleForLanguage($language);
+    
+    $timestamp = strtotime($date);
+    if ($timestamp === false) {
+        return $date;
+    }
+    
+    $intlFormatter = new IntlDateFormatter(
+        $locale,
+        getIntlDateType($format),
+        getIntlTimeType($format),
+        date_default_timezone_get(),
+        IntlDateFormatter::GREGORIAN
+    );
+    
+    return $intlFormatter->format($timestamp);
 }
 
 /**
@@ -223,4 +223,17 @@ function dd($value): void
     var_dump($value);
     echo '</pre>';
     exit;
+}
+
+/**
+ * Generate URL for a named route
+ */
+function route(string $name, array $params = []): string
+{
+    static $router = null;
+    if ($router === null) {
+        $router = new \App\Router\Router();
+        require __DIR__ . '/../Router/routes.php';
+    }
+    return $router->urlFor($name, $params);
 }
