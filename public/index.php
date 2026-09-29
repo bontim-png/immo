@@ -1,30 +1,110 @@
 <?php
 // Entry point - all requests go through here
 
-// Error reporting based on environment
-$config = require __DIR__ . '/../config/config.php';
-
+// Error reporting - enable for debugging
 error_reporting(E_ALL);
-ini_set('display_errors', ($config['app']['debug'] ?? false) ? '1' : '0');
+ini_set('display_errors', '1');
+ini_set('html_errors', '0');
 ini_set('log_errors', '1');
 ini_set('error_log', __DIR__ . '/../logs/php_errors.log');
 
+// Load config FIRST - before anything else
+$config = [];
+$configPath = __DIR__ . '/../config/config.php';
+if (file_exists($configPath)) {
+    $config = require $configPath;
+} else {
+    die('Configuration file not found at: ' . $configPath);
+}
+
 // Set timezone
-date_default_timezone_set($config['app']['timezone'] ?? 'UTC');
+$timezone = $config['app']['timezone'] ?? 'UTC';
+date_default_timezone_set($timezone);
 
 // Start session
-session_name($config['auth']['session_name'] ?? 'immo_session');
+$sessionName = $config['auth']['session_name'] ?? 'immo_session';
+session_name($sessionName);
 session_set_cookie_params([
     'lifetime' => $config['auth']['cookie_lifetime'] ?? 86400,
-    'secure' => $config['auth']['cookie_secure'] ?? true,
+    'path' => '/immobilier/public/',
+    'domain' => '',
+    'secure' => $config['auth']['cookie_secure'] ?? false,
     'httponly' => $config['auth']['cookie_httponly'] ?? true,
     'samesite' => $config['auth']['cookie_samesite'] ?? 'Lax',
 ]);
 session_start();
 
 // Set language from session or default
-if (!isset($_SESSION['language']) || !in_array($_SESSION['language'], ($config['app']['supported_languages'] ?? ['fr', 'en', 'nl']))) {
-    $_SESSION['language'] = $config['app']['default_language'] ?? 'fr';
+$supportedLanguages = $config['app']['supported_languages'] ?? ['fr', 'en', 'nl'];
+$defaultLanguage = $config['app']['default_language'] ?? 'fr';
+if (!isset($_SESSION['language']) || !in_array($_SESSION['language'], $supportedLanguages)) {
+    $_SESSION['language'] = $defaultLanguage;
+}
+
+// Define base URL for use in helpers
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$host = $_SERVER['HTTP_HOST'] ?? '';
+$basePath = dirname($_SERVER['SCRIPT_NAME'] ?? '/immobilier/public/');
+define('BASE_URL', $protocol . '://' . $host . $basePath);
+
+// Minimal config helper - uses global $config instead of requiring config.php each time
+if (!function_exists('config')) {
+    function config(string $key, $default = null) {
+        global $config;
+        $keys = explode('.', $key);
+        $value = $config;
+        foreach ($keys as $k) {
+            if (!isset($value[$k])) {
+                return $default;
+            }
+            $value = $value[$k];
+        }
+        return $value;
+    }
+}
+
+// Minimal base_url helper
+if (!function_exists('base_url')) {
+    function base_url(): string {
+        return BASE_URL;
+    }
+}
+
+// Minimal asset helper
+if (!function_exists('asset')) {
+    function asset(string $path): string {
+        return base_url() . '/public/' . ltrim($path, '/');
+    }
+}
+
+// Minimal trans helper
+if (!function_exists('trans')) {
+    function trans(string $key, array $params = []): string {
+        static $translations = [];
+        $language = $_SESSION['language'] ?? config('app.default_language', 'fr');
+        
+        if (!isset($translations[$language])) {
+            $langFile = __DIR__ . '/../lang/' . $language . '.php';
+            if (file_exists($langFile)) {
+                $translations[$language] = require $langFile;
+            } else {
+                $translations[$language] = [];
+            }
+        }
+        
+        $translation = $translations[$language][$key] ?? $key;
+        foreach ($params as $placeholder => $value) {
+            $translation = str_replace('{' . $placeholder . '}', $value, $translation);
+        }
+        return $translation;
+    }
+}
+
+// Minimal sanitize helper
+if (!function_exists('sanitize')) {
+    function sanitize(string $value): string {
+        return htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    }
 }
 
 // Autoload classes
@@ -45,29 +125,32 @@ spl_autoload_register(function ($class) {
     }
 });
 
-// Load helpers
-require __DIR__ . '/../src/Helpers/functions.php';
+// Load helpers - but use our already-defined functions
+// Skip the config() function from helpers since we have our own
+$helpersPath = __DIR__ . '/../src/Helpers/functions.php';
+if (file_exists($helpersPath)) {
+    // Load helpers but suppress redefinition errors
+    $helperFunctions = get_defined_functions();
+    require $helpersPath;
+}
 
 // Initialize database
-use App\Database\Database;
 use App\Database\Connection;
+use App\Database\Database;
 
 try {
     $dbConfig = $config['database'];
     Connection::setConfig($dbConfig);
     Database::init();
 } catch (PDOException $e) {
-    // Log connection error
     error_log('Database connection failed: ' . $e->getMessage());
     
-    // Show user-friendly error in production
     if (!($config['app']['debug'] ?? false)) {
         http_response_code(503);
         include __DIR__ . '/errors/503.php';
         exit;
     }
     
-    // Show detailed error in development
     die('Database connection error: ' . $e->getMessage());
 }
 
@@ -78,23 +161,25 @@ use App\Router\Route;
 $router = new Router();
 
 // Register routes
-require __DIR__ . '/../src/Router/routes.php';
+$routesPath = __DIR__ . '/../src/Router/routes.php';
+if (file_exists($routesPath)) {
+    require $routesPath;
+} else {
+    die('Routes file not found at: ' . $routesPath);
+}
 
 // Handle request
 try {
     $router->dispatch();
 } catch (Exception $e) {
-    // Log the error
     error_log('Application error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
     
-    // Show user-friendly error
     if (!($config['app']['debug'] ?? false)) {
         http_response_code(500);
         include __DIR__ . '/errors/500.php';
         exit;
     }
     
-    // Show detailed error in development
     echo '<h1>500 Internal Server Error</h1>';
     echo '<pre>' . htmlspecialchars($e->getMessage()) . '</pre>';
     echo '<pre>' . htmlspecialchars($e->getTraceAsString()) . '</pre>';
