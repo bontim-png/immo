@@ -41,71 +41,11 @@ if (!isset($_SESSION['language']) || !in_array($_SESSION['language'], $supported
     $_SESSION['language'] = $defaultLanguage;
 }
 
-// Define base URL for use in helpers
+// Define base URL constant
 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 $host = $_SERVER['HTTP_HOST'] ?? '';
 $basePath = dirname($_SERVER['SCRIPT_NAME'] ?? '/immobilier/public/');
 define('BASE_URL', $protocol . '://' . $host . $basePath);
-
-// Minimal config helper - uses global $config instead of requiring config.php each time
-if (!function_exists('config')) {
-    function config(string $key, $default = null) {
-        global $config;
-        $keys = explode('.', $key);
-        $value = $config;
-        foreach ($keys as $k) {
-            if (!isset($value[$k])) {
-                return $default;
-            }
-            $value = $value[$k];
-        }
-        return $value;
-    }
-}
-
-// Minimal base_url helper
-if (!function_exists('base_url')) {
-    function base_url(): string {
-        return BASE_URL;
-    }
-}
-
-// Minimal asset helper
-if (!function_exists('asset')) {
-    function asset(string $path): string {
-        return base_url() . '/public/' . ltrim($path, '/');
-    }
-}
-
-// Minimal trans helper
-if (!function_exists('trans')) {
-    function trans(string $key, array $params = []): string {
-        static $translations = [];
-        $language = $_SESSION['language'] ?? config('app.default_language', 'fr');
-        
-        if (!isset($translations[$language])) {
-            $langFile = __DIR__ . '/../lang/' . $language . '.php';
-            if (file_exists($langFile)) {
-                $translations[$language] = require $langFile;
-            } else {
-                $translations[$language] = [];
-            }
-        }
-        
-        $translation = $translations[$language][$key] ?? $key;
-        foreach ($params as $placeholder => $value) {
-            $translation = str_replace('{' . $placeholder . '}', $value, $translation);
-        }
-        return $translation;
-    }
-}
-
-// Minimal sanitize helper
-if (!function_exists('sanitize')) {
-    function sanitize(string $value): string {
-        return htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-    }
-}
 
 // Autoload classes
 spl_autoload_register(function ($class) {
@@ -125,14 +65,8 @@ spl_autoload_register(function ($class) {
     }
 });
 
-// Load helpers - but use our already-defined functions
-// Skip the config() function from helpers since we have our own
-$helpersPath = __DIR__ . '/../src/Helpers/functions.php';
-if (file_exists($helpersPath)) {
-    // Load helpers but suppress redefinition errors
-    $helperFunctions = get_defined_functions();
-    require $helpersPath;
-}
+// Load helpers - functions.php uses global $config
+require __DIR__ . '/../src/Helpers/functions.php';
 
 // Initialize database
 use App\Database\Connection;

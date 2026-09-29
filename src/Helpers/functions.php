@@ -3,20 +3,24 @@
 
 /**
  * Get configuration value using dot notation
+ * Uses the global $config array set in index.php
  */
 function config(string $key, $default = null)
 {
+    global $config;
+    if (!isset($config) || !is_array($config)) {
+        // Fallback: try to load config
+        $config = require __DIR__ . '/../../config/config.php';
+    }
     $keys = explode('.', $key);
-    $config = require __DIR__ . '/../../config/config.php';
-    
+    $value = $config;
     foreach ($keys as $k) {
-        if (!isset($config[$k])) {
+        if (!isset($value[$k])) {
             return $default;
         }
-        $config = $config[$k];
+        $value = $value[$k];
     }
-    
-    return $config;
+    return $value;
 }
 
 /**
@@ -215,17 +219,6 @@ function csrf_input(): string
 }
 
 /**
- * Dump and die (for debugging)
- */
-function dd($value): void
-{
-    echo '<pre>';
-    var_dump($value);
-    echo '</pre>';
-    exit;
-}
-
-/**
  * Generate URL for a named route
  */
 function route(string $name, array $params = []): string
@@ -236,4 +229,15 @@ function route(string $name, array $params = []): string
         require __DIR__ . '/../../src/Router/routes.php';
     }
     return $router->urlFor($name, $params);
+}
+
+/**
+ * Dump and die (for debugging)
+ */
+function dd($value): void
+{
+    echo '<pre>';
+    var_dump($value);
+    echo '</pre>';
+    exit;
 }
