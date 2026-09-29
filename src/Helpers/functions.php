@@ -7,7 +7,7 @@
 function config(string $key, $default = null)
 {
     $keys = explode('.', $key);
-    $config = require __DIR__ . '/../config/config.php';
+    $config = require __DIR__ . '/../../config/config.php';
     
     foreach ($keys as $k) {
         if (!isset($config[$k])) {
@@ -233,7 +233,7 @@ function route(string $name, array $params = []): string
     static $router = null;
     if ($router === null) {
         $router = new \App\Router\Router();
-        require __DIR__ . '/../Router/routes.php';
+        require __DIR__ . '/../../src/Router/routes.php';
     }
     return $router->urlFor($name, $params);
 }
