@@ -4,7 +4,7 @@ return [
         'host' => 'localhost',
         'dbname' => 'cleduslo_immo',
         'username' => 'cleduslo_immo_admin',
-        'password' => '500Honden!',
+        'password' => '',
         'charset' => 'utf8mb4',
         'collation' => 'utf8mb4_unicode_ci',
         'options' => [
