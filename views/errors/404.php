@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>404 - Immo</title>
+    <link rel="stylesheet" href="/immobilier/assets/css/app.css">
+</head>
+<body>
+    <main class="app-shell">
+        <h1>404</h1>
+        <p>Page not found.</p>
+    </main>
+</body>
+</html>
