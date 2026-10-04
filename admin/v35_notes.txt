@@ -1,0 +1,6 @@
+v35
+- Heating is rendered inside the Comfort feature group.
+- Air conditioning remains the normal Comfort feature from features.code=air_conditioning.
+- Underfloor heating remains a Heating modal option via features.code=underfloor_heating.
+- Location postcode/city map uses maxZoom 10 and explicitly sets zoom 10 after fitBounds.
+- No database schema changes.

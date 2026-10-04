@@ -1,0 +1,29 @@
+<?php
+declare(strict_types=1);
+require dirname(__DIR__) . '/app/bootstrap.php';
+$auth->requireLogin();
+function e(mixed $v): string { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
+$base=rtrim((string)($config['app']['base_url']??'/immobilier'),'/');
+$userId=(int)$auth->id();
+$message=''; $error='';
+if($_SERVER['REQUEST_METHOD']==='POST'){
+  try{
+    \App\Csrf::verify($_POST['_csrf']??'');
+    $first=trim((string)($_POST['first_name']??'')); $last=trim((string)($_POST['last_name']??''));
+    $email=trim((string)($_POST['email']??'')); $phone=trim((string)($_POST['phone']??'')); $lang=strtolower(trim((string)($_POST['language']??'')));
+    if($first===''||$last===''||$email==='') throw new RuntimeException(__t('settings.required','First name, last name and email are required.'));
+    if(!filter_var($email,FILTER_VALIDATE_EMAIL)) throw new RuntimeException(__t('settings.invalid_email','Please enter a valid email address.'));
+    $ls=$db->prepare('SELECT id FROM i18n_languages WHERE code=:code AND is_active=1 LIMIT 1'); $ls->execute(['code'=>$lang]); $langId=$ls->fetchColumn();
+    if(!$langId) throw new RuntimeException(__t('settings.invalid_language','The selected language is not available.'));
+    $s=$db->prepare('SELECT id FROM users WHERE email=:email AND id<>:id AND deleted_at IS NULL LIMIT 1'); $s->execute(['email'=>$email,'id'=>$userId]); if($s->fetchColumn()) throw new RuntimeException(__t('settings.email_exists','This email address is already in use.'));
+    $s=$db->prepare('UPDATE users SET first_name=:first_name,last_name=:last_name,email=:email,phone=:phone,preferred_language_id=:language_id WHERE id=:id AND deleted_at IS NULL');
+    $s->execute(['first_name'=>$first,'last_name'=>$last,'email'=>$email,'phone'=>$phone!==''?$phone:null,'language_id'=>(int)$langId,'id'=>$userId]);
+    $i18n->setLanguage($lang); $_SESSION['prrepl_lang']=$lang; $message=__t('settings.saved','Your settings have been saved.');
+  }catch(Throwable $ex){$error=$ex->getMessage();}
+}
+$s=$db->prepare('SELECT u.first_name,u.last_name,u.email,u.phone,l.code AS language_code,o.name AS office_name FROM users u LEFT JOIN i18n_languages l ON l.id=u.preferred_language_id LEFT JOIN offices o ON o.id=u.office_id AND o.deleted_at IS NULL WHERE u.id=:id AND u.deleted_at IS NULL LIMIT 1'); $s->execute(['id'=>$userId]); $user=$s->fetch()?:[];
+$currentLang=(string)($user['language_code']?:$i18n->getLanguage()?:'en');
+$languages=$db->query('SELECT code,native_name FROM i18n_languages WHERE is_active=1 ORDER BY id')->fetchAll();
+$officeName=trim((string)($user['office_name']??'')); if($officeName==='') $officeName=$auth->isSuperAdmin()?'Platform':'Office';
+$csrf=\App\Csrf::token();
+?><!doctype html><html lang="<?=e($currentLang)?>"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title><?=e(__t('settings.title','Settings'))?> — <?=e($officeName)?></title><link rel="stylesheet" href="<?=e($base)?>/assets/css/dashboard.css"><style>.settings-card{max-width:760px;background:#fff;border:1px solid #e4e7ec;border-radius:14px;padding:24px;margin-top:24px}.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.settings-field{display:flex;flex-direction:column;gap:7px}.settings-field.full{grid-column:1/-1}.settings-field label{font-size:13px;font-weight:600;color:#344054}.settings-field input,.settings-field select{padding:11px 12px;border:1px solid #d0d5dd;border-radius:9px;font:inherit;background:#fff}.settings-actions{margin-top:22px;display:flex;justify-content:flex-end}.settings-alert{padding:12px 14px;border-radius:9px;margin-top:20px}.settings-alert.success{background:#ecfdf3;color:#067647}.settings-alert.error{background:#fef3f2;color:#b42318}@media(max-width:700px){.settings-grid{grid-template-columns:1fr}.settings-field.full{grid-column:auto}}</style></head><body><div class="app-shell"><?php require __DIR__ . '/_sidebar.php'; ?><main class="main"><section class="welcome"><div><span class="eyebrow"><?=e(__t('settings.eyebrow','ACCOUNT'))?></span><h2><?=e(__t('settings.title','Settings'))?></h2><p><?=e(__t('settings.subtitle','Manage your personal details and language.'))?></p></div></section><?php if($message):?><div class="settings-alert success"><?=e($message)?></div><?php endif;?><?php if($error):?><div class="settings-alert error"><?=e($error)?></div><?php endif;?><form class="settings-card" method="post"><input type="hidden" name="_csrf" value="<?=e($csrf)?>"><div class="settings-grid"><div class="settings-field"><label for="first_name"><?=e(__t('settings.first_name','First name'))?></label><input id="first_name" name="first_name" value="<?=e($user['first_name']??'')?>" required></div><div class="settings-field"><label for="last_name"><?=e(__t('settings.last_name','Last name'))?></label><input id="last_name" name="last_name" value="<?=e($user['last_name']??'')?>" required></div><div class="settings-field full"><label for="email"><?=e(__t('settings.email','Email'))?></label><input id="email" type="email" name="email" value="<?=e($user['email']??'')?>" required></div><div class="settings-field"><label for="phone"><?=e(__t('settings.phone','Phone'))?></label><input id="phone" name="phone" value="<?=e($user['phone']??'')?>"></div><div class="settings-field"><label for="language"><?=e(__t('settings.language','Language'))?></label><select id="language" name="language"><?php foreach($languages as $language):?><option value="<?=e($language['code'])?>" <?=$currentLang===$language['code']?'selected':''?>><?=e($language['native_name'])?></option><?php endforeach;?></select></div></div><div class="settings-actions"><button class="button-primary" type="submit"><?=e(__t('settings.save','Save changes'))?></button></div></form></main></div></body></html>

@@ -1,0 +1,3 @@
+<?php
+// Copy this file to config/config.php and enter your cPanel credentials.
+return require __DIR__ . '/config.example.php';

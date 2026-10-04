@@ -1,0 +1,105 @@
+:root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#17202a;background:#f5f7fa;font-synthesis:none}*{box-sizing:border-box}body{margin:0}.app-shell{min-height:100vh;display:flex}.sidebar{width:250px;background:#101820;color:#d7dee5;padding:24px 16px;display:flex;flex-direction:column;flex-shrink:0}.brand{display:flex;align-items:center;gap:10px;color:#fff;font-weight:800;letter-spacing:.14em;font-size:15px;padding:4px 10px 30px}.brand-mark{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:#fff;color:#101820;font-weight:900}.workspace{border:1px solid #2a3540;border-radius:12px;padding:12px;margin-bottom:22px}.workspace-label,.eyebrow{font-size:10px;letter-spacing:.14em;font-weight:800;color:#83909c}.workspace strong{display:block;color:#fff;margin-top:5px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.nav{display:flex;flex-direction:column;gap:4px}.nav-section{font-size:9px;font-weight:800;letter-spacing:.14em;color:#697580;padding:22px 12px 7px}.nav-item{display:flex;align-items:center;gap:12px;color:#9eabb6;text-decoration:none;padding:10px 12px;border-radius:9px;font-size:13px}.nav-item span{width:18px;text-align:center}.nav-item:hover,.nav-item.active{background:#1d2934;color:#fff}.sidebar-bottom{margin-top:auto;border-top:1px solid #26323d;padding-top:14px}.main{flex:1;min-width:0;padding:28px 38px}.topbar{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e1e6eb;padding-bottom:22px}.topbar h1{font-size:27px;margin:5px 0 0;letter-spacing:-.03em}.profile{display:flex;align-items:center;gap:10px}.profile strong,.profile small{display:block}.profile strong{font-size:13px}.profile small{font-size:11px;color:#89949e;margin-top:2px}.avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#dce3e9;font-size:12px;font-weight:800}.welcome{margin:30px 0 24px;display:flex;justify-content:space-between;align-items:end}.welcome h2{font-size:25px;margin:5px 0}.welcome p{margin:0;color:#78838e}.scope-badge{background:#fff;border:1px solid #e0e5e9;padding:9px 13px;border-radius:9px;font-size:12px;color:#56616b}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:22px}.stat{background:#fff;border:1px solid #e1e6ea;border-radius:13px;padding:19px}.stat span{display:block;font-size:10px;letter-spacing:.13em;color:#87929d;font-weight:800}.stat strong{display:block;font-size:29px;margin:9px 0 4px;letter-spacing:-.04em}.stat small{color:#8a949e;font-size:11px}.content-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(280px,1fr);gap:18px}.panel{background:#fff;border:1px solid #e1e6ea;border-radius:13px;overflow:hidden}.panel-head{display:flex;justify-content:space-between;align-items:center;padding:20px 21px;border-bottom:1px solid #edf0f2}.panel-head h3{margin:5px 0 0;font-size:16px}.panel-head a{font-size:12px;color:#17202a;text-decoration:none;font-weight:700}.property-row{display:grid;grid-template-columns:40px minmax(0,1fr) 130px 85px;align-items:center;gap:12px;padding:13px 20px;border-bottom:1px solid #edf0f2}.property-row:last-child{border-bottom:0}.property-icon{width:36px;height:36px;border-radius:8px;background:#f0f3f5;display:grid;place-items:center}.property-main strong,.property-main span{display:block}.property-main strong{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.property-main span,.property-agent{font-size:11px;color:#87919b;margin-top:3px}.property-agent{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.status{font-size:10px;text-align:center;padding:5px 7px;border-radius:20px;background:#f0f2f4;color:#68747e}.status.published{background:#eaf5ef;color:#287148}.empty{padding:40px 20px;text-align:center;display:flex;flex-direction:column;gap:5px;color:#7d8892}.empty strong{color:#303a43}.access-panel{padding-bottom:12px}.account-line{display:flex;justify-content:space-between;gap:15px;padding:13px 20px;border-bottom:1px solid #edf0f2;font-size:12px}.account-line span{color:#89949e}.account-line strong{text-align:right;max-width:65%;overflow:hidden;text-overflow:ellipsis}.permissions{padding:20px;display:flex;flex-wrap:wrap;gap:7px}.permissions .eyebrow{width:100%;margin-bottom:2px}.permissions span:not(.eyebrow){font-size:10px;padding:6px 9px;background:#f0f3f5;border-radius:6px}@media(max-width:1050px){.stats{grid-template-columns:repeat(2,1fr)}.content-grid{grid-template-columns:1fr}}@media(max-width:760px){.sidebar{width:64px;padding:18px 8px}.brand{padding:4px 6px 24px}.brand>span:last-child,.workspace,.nav-item:not(.active)::after,.nav-item{font-size:0}.nav-item span{font-size:14px}.nav-item{justify-content:center;padding:11px}.nav-section{display:none}.main{padding:20px}.property-row{grid-template-columns:36px minmax(0,1fr) 75px}.property-agent{display:none}.welcome{align-items:start;flex-direction:column;gap:15px}}
+.top-actions{display:flex;align-items:center;gap:12px}.language-switcher{display:flex;align-items:center;gap:3px;padding:3px;border:1px solid #e0e5e9;background:#fff;border-radius:10px}.language{display:grid;place-items:center;width:31px;height:28px;border-radius:7px;text-decoration:none;font-size:17px;line-height:1}.language.active{background:#eef2f5}.welcome-actions{display:flex;align-items:center;gap:10px}.button-primary{display:inline-flex;align-items:center;justify-content:center;height:40px;padding:0 15px;border-radius:9px;background:#17202a;color:#fff;text-decoration:none;font-size:12px;font-weight:750}.property-row{color:inherit;text-decoration:none}.property-price{font-size:11px;color:#68747e;text-align:right;white-space:nowrap}.brand-office{max-width:165px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+
+/* ============================================================
+   IMMO TYPOGRAPHY CONSISTENCY
+   Reference: Offices / Employee edit
+   Do not change layout, colors or component structure.
+   ============================================================ */
+:root{
+  --immo-font:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+body{
+  font-family:var(--immo-font);
+  font-size:15px;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+
+/* Shared page headings */
+.page-heading h2,
+.edit-heading h2,
+.property-heading h2{
+  font-size:27px;
+  font-weight:800;
+  letter-spacing:-.03em;
+}
+
+/* Shared form/card headings */
+.form-card-head h3,
+.form-card h3,
+.edit-card h3{
+  font-size:17px;
+  font-weight:800;
+  letter-spacing:-.015em;
+}
+
+/* Shared form labels */
+.fields label,
+.fields>label,
+.status-field>span,
+.field-grid label,
+.tab-panel-grid>div>label{
+  font-size:11px;
+  font-weight:750;
+  line-height:1.35;
+}
+
+/* Shared form controls */
+.fields input,
+.fields select,
+.fields textarea,
+.field-grid input,
+.field-grid select,
+.field-grid textarea,
+.tab-panel-grid input,
+.tab-panel-grid select,
+.tab-panel-grid textarea{
+  font-family:inherit;
+  font-size:15px;
+  line-height:1.35;
+}
+
+/* Tables */
+.employee-table td,
+.property-table td{
+  font-size:12px;
+}
+.employee-table th,
+.property-table th{
+  font-size:10px;
+}
+
+/* Buttons */
+.button-primary,
+.button-secondary,
+.property-filters button,
+.actions a,
+.actions button{
+  font-family:inherit;
+}
+
+/* Property editor: match Offices/Employees edit form typography.
+   Hero remains a distinct property component; only the editable form
+   controls and labels are normalized. */
+.pr-main .field-grid label,
+.pr-main .tab-panel-grid>div>label{
+  font-size:11px!important;
+  font-weight:750!important;
+}
+.pr-main .field-grid input,
+.pr-main .field-grid select,
+.pr-main .field-grid textarea,
+.pr-main .tab-panel-grid input,
+.pr-main .tab-panel-grid select,
+.pr-main .tab-panel-grid textarea{
+  font-family:inherit!important;
+  font-size:15px!important;
+  line-height:1.35!important;
+}
+.pr-main .property-tab{
+  font-family:inherit!important;
+  font-size:13px!important;
+  font-weight:680!important;
+}

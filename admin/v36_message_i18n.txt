@@ -1,0 +1,37 @@
+Add these keys to i18n_translations if they are not already present:
+
+EN
+common.success = Success
+common.error = Something went wrong
+common.cancel = Cancel
+employees.no_offices_title = No active office available
+employees.no_offices = Create or activate an office before adding an employee.
+properties.delete_title = Delete property?
+properties.delete_warning = This property will be removed from the active property list. This action cannot be undone from this screen.
+properties.delete_access_error = You do not have permission to delete this property.
+properties.back_to_properties = Back to properties
+properties.delete_error = The property could not be deleted. Please check your permissions and try again.
+
+FR
+common.success = Succès
+common.error = Une erreur est survenue
+common.cancel = Annuler
+employees.no_offices_title = Aucun bureau actif disponible
+employees.no_offices = Créez ou activez un bureau avant d'ajouter un employé.
+properties.delete_title = Supprimer le bien ?
+properties.delete_warning = Ce bien sera retiré de la liste active. Cette action ne peut pas être annulée depuis cet écran.
+properties.delete_access_error = Vous n'avez pas l'autorisation de supprimer ce bien.
+properties.back_to_properties = Retour aux biens
+properties.delete_error = Le bien n'a pas pu être supprimé. Vérifiez vos droits et réessayez.
+
+NL
+common.success = Gelukt
+common.error = Er is iets misgegaan
+common.cancel = Annuleren
+employees.no_offices_title = Geen actief kantoor beschikbaar
+employees.no_offices = Maak eerst een kantoor aan of activeer een kantoor voordat je een medewerker toevoegt.
+properties.delete_title = Object verwijderen?
+properties.delete_warning = Dit object wordt uit de actieve objectlijst verwijderd. Deze actie kan vanuit dit scherm niet ongedaan worden gemaakt.
+properties.delete_access_error = Je hebt geen rechten om dit object te verwijderen.
+properties.back_to_properties = Terug naar objecten
+properties.delete_error = Het object kon niet worden verwijderd. Controleer je rechten en probeer het opnieuw.

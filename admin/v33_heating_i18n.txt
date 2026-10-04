@@ -1,0 +1,12 @@
+FR: features.heating.title=Chauffage
+FR: features.heating.method=Type de chauffage
+FR: features.heating.select=Choisir le chauffage
+FR: features.underfloor_heating=Chauffage au sol
+EN: features.heating.title=Heating
+EN: features.heating.method=Heating method
+EN: features.heating.select=Select heating
+EN: features.underfloor_heating=Underfloor heating
+NL: features.heating.title=Verwarming
+NL: features.heating.method=Verwarmingsmethode
+NL: features.heating.select=Kies verwarming
+NL: features.underfloor_heating=Vloerverwarming

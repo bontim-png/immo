@@ -1,0 +1,17 @@
+FR:
+features.comfort=Confort
+features.air_conditioning=Climatisation
+features.select_air_conditioning=Choisir la climatisation
+features.air_conditioning_present=Climatisation présente
+
+EN:
+features.comfort=Comfort
+features.air_conditioning=Air conditioning
+features.select_air_conditioning=Select air conditioning
+features.air_conditioning_present=Air conditioning present
+
+NL:
+features.comfort=Comfort
+features.air_conditioning=Airconditioning
+features.select_air_conditioning=Kies airconditioning
+features.air_conditioning_present=Airconditioning aanwezig
